@@ -9,6 +9,13 @@
           <v-card rounded elevation="4" class="pa-5 pb-8 mt-10" light>
             <h1 class="mb-4 text-center">User Signup</h1>
             <v-form class="pa-5 pb-8 mt-10" v-model="valid" ref="form">
+              <v-file-input
+                label="Add an Image"
+                outlined
+                small-chips
+                v-model="image"
+                prepend-icon="mdi-camera"
+              ></v-file-input>
               <v-text-field
                 name="first name"
                 label="First Name"
@@ -85,9 +92,10 @@
   </div>
 </template>
 <script>
-import { auth } from "@/firebase";
-import { createUserWithEmailAndPassword,updateProfile } from "@firebase/auth";
+import { auth, storage } from "@/firebase";
+import { createUserWithEmailAndPassword, updateProfile } from "@firebase/auth";
 import Errorbar from "../components/Errorbar.vue";
+import { uploadBytes, getDownloadURL, ref } from "@firebase/storage";
 
 export default {
   name: "StudentSignup",
@@ -104,35 +112,55 @@ export default {
       showPass: false,
       valid: false,
       error: "",
+      image: null,
+      source: "",
+      uid: "",
     };
   },
   methods: {
-    signUp() {
+    async signUp() {
       this.error = "";
       this.$refs.form.validate();
       if (this.valid) {
         if (this.password !== this.rePassword) {
           window.alert("Password must match");
         } else {
-          createUserWithEmailAndPassword(auth, this.email, this.password)
-            .then((res) => {
-              
+          try {
+            let res = await createUserWithEmailAndPassword(
+              auth,
+              this.email,
+              this.password
+            );
 
-              updateProfile(auth.currentUser,{
-                  displayName: this.fullname,
-                })
-                .then((response) => {
-                  console.log("response", response);
-                  this.$router.push('/')
-                }).catch((error)=>{
-                  console.error(error);
-                })
-            })
-            .catch((err) => {
-              if (err.code == "auth/email-already-in-use")
-                this.error = "This email already exist";
-            })
-            
+            this.uid = res.user.uid;
+
+            if (this.image != null) {
+              const imagesRef = ref(
+                storage,
+                `profile/${this.uid}/${this.image.name}`
+              );
+
+              await uploadBytes(imagesRef, this.image);
+
+              this.source = await getDownloadURL(
+                ref(storage, `profile/${this.uid}/${this.image.name}`)
+              );
+            }
+
+            await updateProfile(auth.currentUser, {
+              displayName: this.fullname,
+              photoURL: this.source,
+              email: this.email,
+            });
+
+            this.$router.push("/");
+          } catch (error) {
+            if (error.code == "auth/email-already-in-use")
+              this.error = "This email already exist";
+            else {
+              console.error(error);
+            }
+          }
         }
       } else {
         console.error("fill form correctly");

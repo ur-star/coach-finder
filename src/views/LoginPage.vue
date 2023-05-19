@@ -28,7 +28,7 @@
                   v-model="password"
                   outlined
                 ></v-text-field>
-                <v-checkbox dense label="I am a Trainer"></v-checkbox>
+                <!-- <v-checkbox dense label="I am a Trainer"></v-checkbox> -->
               </v-form>
             </v-card-text>
 
@@ -42,9 +42,9 @@
               >
             </v-card-actions>
             <v-card-text class="text-center">
-              Forgot Password?
+              New Here?
 
-              <router-link to="/reset"> Reset Password</router-link>
+              <router-link to="/signup"> Register Yourself</router-link>
             </v-card-text>
           </v-card>
         </v-col>
@@ -83,17 +83,17 @@ export default {
       this.error = null;
       signInWithEmailAndPassword(auth, this.email, this.password)
         .then((userCredential) => {
-          // console.log("Login: " + JSON.stringify(userCredential));
+          //console.log("Login: " + JSON.stringify(userCredential));
           if (userCredential.user.uid) {
             let name = userCredential.user.displayName
             let uid = userCredential.user.uid
+            let email = userCredential.user.email
+            let imageUrl =userCredential.user.photoURL
             
             // console.log(name,uid);
             this.$store.commit('toggleLoggedInStatus',true)
-            this.$store.commit('userDetails',{name,uid})
+            this.$store.commit('userDetails',{name,uid,email,imageUrl})
             
-
-          
 
           }
         }).then(() => {

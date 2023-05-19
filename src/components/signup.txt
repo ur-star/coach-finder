@@ -1,14 +1,449 @@
-import { collection, query, where, getDocs } from "firebase/firestore";
+<template>
+  <div>
+    <v-container>
+      <Errorbar v-if="error" :msg="error" />
+      <v-row>
+        <v-spacer></v-spacer>
 
-const q = query(collection(db, "cities"), where("capital", "==", true));
+        <v-col cols="8" md="6">
+          <v-card rounded elevation="4" class="pa-5 pb-8 mt-10" light>
+            <h1 class="mb-4 text-center">User Signup</h1>
+            <v-form class="pa-5 pb-8 mt-10" v-model="valid" ref="form">
+              <v-file-input
+                label="Add an Image"
+                outlined
+                small-chips
+                v-model="image"
+                prepend-icon="mdi-camera"
+              ></v-file-input>
+              <v-text-field
+                name="first name"
+                label="First Name"
+                v-model="firstName"
+                :rules="[(v) => !!v || 'name is required']"
+                outlined
+              ></v-text-field>
+              <v-text-field
+                name="last name"
+                label="Last Name"
+                v-model="lastName"
+                :rules="[(v) => !!v || 'name is required']"
+                outlined
+              ></v-text-field>
 
-const querySnapshot = await getDocs(q);
-querySnapshot.forEach((doc) => {
-  // doc.data() is never undefined for query doc snapshots
-  console.log(doc.id, " => ", doc.data());
-});
+              <v-text-field
+                name="Email"
+                label="Email"
+                v-model="email"
+                :rules="[
+                  (v) => !!v || 'Email is required',
+                  (v) => /.+@.+\..+/.test(v) || ' E-mail must be valid',
+                ]"
+                outlined
+              ></v-text-field>
 
+              <v-text-field
+                v-model="rePassword"
+                :append-icon="showPass ? 'mdi-eye' : 'mdi-eye-off'"
+                :type="showPass ? 'text' : 'password'"
+                :rules="[
+                  (v) => !!v || 'Password is required',
+                  (v) =>
+                    v.length > 7 || 'Length must be more than 8 characters',
+                ]"
+                name="Re-Password"
+                label="Re-Enter Password"
+                hint="At least 8 characters"
+                counter
+                outlined
+                @click:append="showPass = !showPass"
+              ></v-text-field>
+
+              <v-text-field
+                v-model="password"
+                :append-icon="showPass ? 'mdi-eye' : 'mdi-eye-off'"
+                :type="showPass ? 'text' : 'password'"
+                :rules="[
+                  (v) => !!v || 'Password is required',
+                  (v) =>
+                    v.length > 7 || 'Length must be more than 8 characters',
+                ]"
+                name="Password"
+                label="Enter Password"
+                hint="At least 8 characters"
+                counter
+                outlined
+                @click:append="showPass = !showPass"
+              ></v-text-field>
+
+              <v-btn
+                block
+                :disabled="!valid"
+                @click="signUp"
+                class="mx-auto font-weight-bold grey darken-4 v-size--x-large white--text"
+                >Submit</v-btn
+              >
+            </v-form>
+          </v-card>
+        </v-col>
+        <v-spacer></v-spacer>
+      </v-row>
+    </v-container>
+  </div>
+</template>
+<script>
+import { auth, storage } from "@/firebase";
+import { createUserWithEmailAndPassword, updateProfile } from "@firebase/auth";
+import Errorbar from "../components/Errorbar.vue";
+
+export default {
+  name: "StudentSignup",
+  components: {
+    Errorbar,
+  },
+  data() {
+    return {
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+      rePassword: "",
+      showPass: false,
+      valid: false,
+      error: "",
+      image: null,
+      source: "",
+      uid:""
+    };
+  },
+  methods: {
+    async signUp() {
+      this.error = "";
+      this.$refs.form.validate();
+      if (this.valid) {
+        if (this.password !== this.rePassword) {
+          window.alert("Password must match");
+        } else {
+          try {
+        let res =  await createUserWithEmailAndPassword(
+              auth,
+              this.email,
+              this.password
+            );
+            const uid = res.user.uid;
+            log uid
+
+            if (this.image != null) {
+              const imagesRef = ref(
+                storage,
+                `profile/${uid}/${this.image.name}`
+              );
+              await uploadBytes(imagesRef, this.image);
+
+              this.source = await getDownloadURL(
+                ref(storage, `profile/${this.uid}/${this.image.name}`)
+              );
+            }
+
+            await updateProfile(auth.currentUser, {
+              displayName: this.fullname,
+              photoURL:this.source,
+              email:this.email,
+            })
+              
+                this.$router.push("/");
+              
+          } catch (error) {
+            if (err.code == "auth/email-already-in-use")
+              this.error = "This email already exist";
+          }
+        }
+      } else {
+        console.error("fill form correctly");
+      }
+    },
+  },
+  beforeMount() {
+    this.$store.commit("drawerController", false);
+  },
+  computed: {
+    fullname() {
+      return this.firstName + " " + this.lastName;
+    },
+   
+  },
+};
+</script>
 
 
         --------------------------------------------------------------------------------------------------------------------
         
+
+
+
+
+
+        <template>
+  <div>
+    <v-container>
+      <Errorbar v-if="error" :msg="error" />
+      <v-row>
+        <v-spacer></v-spacer>
+
+        <v-col cols="8" md="6">
+          <v-card rounded elevation="4" class="pa-5 pb-8 mt-10" light>
+            <h1 class="mb-4 text-center">User Signup</h1>
+            <v-form class="pa-5 pb-8 mt-10" v-model="valid" ref="form">
+              <v-text-field
+                name="first name"
+                label="First Name"
+                v-model="firstName"
+                :rules="[(v) => !!v || 'name is required']"
+                outlined
+              ></v-text-field>
+              <v-text-field
+                name="last name"
+                label="Last Name"
+                v-model="lastName"
+                :rules="[(v) => !!v || 'name is required']"
+                outlined
+              ></v-text-field>
+
+              <v-text-field
+                name="Email"
+                label="Email"
+                v-model="email"
+                :rules="[
+                  (v) => !!v || 'Email is required',
+                  (v) => /.+@.+\..+/.test(v) || ' E-mail must be valid',
+                ]"
+                outlined
+              ></v-text-field>
+
+              <v-text-field
+                v-model="rePassword"
+                :append-icon="showPass ? 'mdi-eye' : 'mdi-eye-off'"
+                :type="showPass ? 'text' : 'password'"
+                :rules="[
+                  (v) => !!v || 'Password is required',
+                  (v) =>
+                    v.length > 7 || 'Length must be more than 8 characters',
+                ]"
+                name="Re-Password"
+                label="Re-Enter Password"
+                hint="At least 8 characters"
+                counter
+                outlined
+                @click:append="showPass = !showPass"
+              ></v-text-field>
+
+              <v-text-field
+                v-model="password"
+                :append-icon="showPass ? 'mdi-eye' : 'mdi-eye-off'"
+                :type="showPass ? 'text' : 'password'"
+                :rules="[
+                  (v) => !!v || 'Password is required',
+                  (v) =>
+                    v.length > 7 || 'Length must be more than 8 characters',
+                ]"
+                name="Password"
+                label="Enter Password"
+                hint="At least 8 characters"
+                counter
+                outlined
+                @click:append="showPass = !showPass"
+              ></v-text-field>
+
+              <v-btn
+                block
+                :disabled="!valid"
+                @click="signUp"
+                class="mx-auto font-weight-bold grey darken-4 v-size--x-large white--text"
+                >Submit</v-btn
+              >
+            </v-form>
+          </v-card>
+        </v-col>
+        <v-spacer></v-spacer>
+      </v-row>
+    </v-container>
+  </div>
+</template>
+<script>
+import { auth } from "@/firebase";
+import { createUserWithEmailAndPassword,updateProfile } from "@firebase/auth";
+import Errorbar from "../components/Errorbar.vue";
+
+export default {
+  name: "StudentSignup",
+  components: {
+    Errorbar,
+  },
+  data() {
+    return {
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+      rePassword: "",
+      showPass: false,
+      valid: false,
+      error: "",
+    };
+  },
+  methods: {
+    signUp() {
+      this.error = "";
+      this.$refs.form.validate();
+      if (this.valid) {
+        if (this.password !== this.rePassword) {
+          window.alert("Password must match");
+        } else {
+          createUserWithEmailAndPassword(auth, this.email, this.password)
+            .then((res) => {
+              
+
+              updateProfile(auth.currentUser,{
+                  displayName: this.fullname,
+                })
+                .then((response) => {
+                  console.log("response", response);
+                  this.$router.push('/')
+                }).catch((error)=>{
+                  console.error(error);
+                })
+            })
+            .catch((err) => {
+              if (err.code == "auth/email-already-in-use")
+                this.error = "This email already exist";
+            })
+            
+        }
+      } else {
+        console.error("fill form correctly");
+      }
+    },
+  },
+  beforeMount() {
+    this.$store.commit("drawerController", false);
+  },
+  computed: {
+    fullname() {
+      return this.firstName + " " + this.lastName;
+    },
+  },
+};
+</script>
+
+
+---------------------------------------------------------------------------------------------
+
+<template>
+  <div id="card">
+    <!-- <InfoDialog /> -->
+    <template>
+  <div id="detail-card" class="text-center">
+    <v-dialog width="800" v-model="dialog">
+      <v-card light class="pa-5 pb-8">
+        <v-img :src="source" contain height="300"></v-img>
+
+        <v-card-title > <h2>{{ name }}</h2> </v-card-title>
+        <v-card-text class="text-subtitle-2">
+          {{ description ? description : "No description yet" }}
+        </v-card-text>
+        <v-chip
+        class="pa-2 ma-2"
+        color="blue"
+        pill
+        large
+        v-for="(item, index) in skills"
+        :key="index"
+        >{{ item }}
+      </v-chip>
+      </v-card>
+    </v-dialog>
+  </div>
+</template>
+    <v-card light elevation="4" class="pa-5  mt-10 mb-2" max-width="auto">
+      <v-img :src="source" contain ></v-img>
+      <v-divider></v-divider>
+      <v-card-title > <h4>{{ name }}</h4> </v-card-title>
+      <v-card-text>
+        {{
+          description ? description : "No description yet" | shortDescription
+        }}
+      </v-card-text>
+      <v-chip
+        class="pa-1 mx-1"
+        color="blue"
+        pill
+        small
+        v-for="(item, index) in skills"
+        :key="index"
+        >{{ item }}
+      </v-chip>
+      <v-card-actions>
+        <v-btn
+          class="mx-auto my-2 grey darken-4 white--text"
+          @click='dialog = !dialog'
+          >Know More</v-btn
+        >
+      </v-card-actions>
+    </v-card>
+  </div>
+</template>
+
+<script>
+import InfoDialog from './InfoDialog.vue';
+export default {
+  name: "Card",
+  components:{
+    InfoDialog
+  },
+  props: {
+    name: {
+      type: String,
+      default: "Title",
+    },
+    description: {
+      type: String,
+      default: "This place contains the description of the trainer",
+    },
+    source: {
+      type: String,
+      default: "https://picsum.photos/230/150",
+    },
+    index: {
+      type: Number,
+    },
+    skills: {
+      type: Array,
+    },
+  },
+  data() {
+    return {
+      dialog:false,
+    }
+  },
+  filters: {
+    shortDescription: function (value) {
+      if (value.length > 70) {
+        return value.slice(0, 70) + "....";
+      } else {
+        return value;
+      }
+    },
+  },
+
+  methods: {
+    toggleDialogValue: function () {
+      this.$store.commit("toggleDialog");
+    },
+  },
+};
+</script>
+<style>
+/* #card{
+  min-height: 290px;
+} */
+</style>

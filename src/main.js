@@ -9,8 +9,9 @@ Vue.config.productionTip = false
 Vue.filter('name',function(value){
   let nameValue=[]
   if(value){ let data = value.toUpperCase().split(" ")
-  nameValue = data[0]}
-  return nameValue;
+  nameValue = data[0]
+  return nameValue;}
+  else return "user"
 })
 new Vue({
   router,

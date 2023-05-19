@@ -1,5 +1,6 @@
 <template>
   <div>
+    <h2 class="ma-4">Hello {{ user | name }} !!</h2>
     <v-row class="mt-6 mx-4">
       <v-col cols="12" md="3" sm="6">
         <!-- <Finder /> -->
@@ -14,9 +15,9 @@
                   </v-card-title>
                   <v-form class="pa-4">
                     <v-text-field
-                      name="location"
-                      label="Location"
-                      v-model="locationFilter"
+                      name="country"
+                      label="country"
+                      v-model="countryFilter"
                       outlined
                     ></v-text-field>
                     <v-text-field
@@ -29,7 +30,7 @@
                     <v-btn
                       class="mx-auto font-weight-bold grey darken-2 v-size--x-large white--text"
                       block
-                      @click="filterResults"
+                      @click="filterdResults"
                       >Find</v-btn
                     >
                   </v-form>
@@ -39,9 +40,9 @@
           </div>
         </template>
       </v-col>
-      <InfoDialog />
-      <template v-for="(item, index) in data">
-        <v-col cols="12" md="3" sm="6" class="text-center">
+      <!-- <InfoDialog /> -->
+      <template v-for="(item, index) in filteredData">
+        <v-col cols="auto" md="3" sm="6" class="text-center">
           <Card
             :key="index"
             :description="item.description"
@@ -58,26 +59,33 @@
 
 <script>
 import Card from "./Card.vue";
-import InfoDialog from "./InfoDialog.vue";
-import { collection, query, where, getDocs } from "firebase/firestore";
+
+import { collection,query, where, getDocs } from "firebase/firestore";
 import { db } from "@/firebase";
 
 export default {
   components: {
     Card,
-    InfoDialog,
   },
   data() {
     return {
       data: [],
+      filteredData:[],
       index: null,
-      locationFilter: "",
+      countryFilter: "",
       skillFilter: "",
     };
   },
   created() {
     // console.log("created called");
     this.getData();
+  },
+
+  computed: {
+    user() {
+      return this.$store.state.userDetails.name;
+    },
+    
   },
 
   methods: {
@@ -90,33 +98,52 @@ export default {
           skills: doc.data().skills,
           country: doc.data().country,
           source: doc.data().source,
-        }
-    
+        };
+
         this.data.push(data);
-       
       });
+      this.filteredData = this.data;
       // console.log(this.data);
     },
-    async filterResults() {
-      // console.log("Run filter results ",this.locationFilter);
+    // filterdResults() {
+    //   if(this.skillFilter && this.countryFilter){
+    //     const skillFilter = this.skillFilter.toLowerCase().trim();
+      
+    //     const countryFilter = this.countryFilter.toLowerCase().trim();
+      
 
-      // const q = query(
-      //   collection(db, "trainers"),
-      //   where("country", "==", this.locationFilter),
-      // );
+    //   this.filteredData = this.data.filter(candidate => {
+    //     const candidateSkills = candidate.skills.map(skill => skill.toLowerCase().trim());
+    //     // console.log(candidate.country);
+    //     const candidateLocation = candidate.country.toLowerCase().trim();
 
-      // const querySnapshot = await getDocs(q);
-      // querySnapshot.forEach((doc) => {
-      //   const queryData = {
-      //     name: doc.data().name,
-      //     description: doc.data().description,
-      //     skills: doc.data().skills,
-      //     country: doc.data().country,
-      //   };
-      //   this.filteredData.push(queryData)
-      // });
-      // console.log(this.filteredData);
+    //     return candidateSkills.includes(skillFilter) && candidateLocation === countryFilter;
+    //   })}
+    //   else this.filteredData = this.data
+    // },
+    async filterdResults() {
+      console.log("Run filter results ",this.skillFilter);
+      if(this.skillFilter==""&&this.countryFilter=="") this.filteredData = this.data;
+
+      const q = query(
+        collection(db, "trainers"),
+        where("skills", "array-contains", this.skillFilter),
+      );
+
+      const querySnapshot = await getDocs(q);
+      querySnapshot.forEach((doc) => {
+        const queryData = {
+          name: doc.data().name,
+          description: doc.data().description,
+          skills: doc.data().skills,
+          country: doc.data().country,
+        };
+        this.filteredData = [];
+        this.filteredData.push(queryData)
+      });
+      console.log(this.filteredData);
     },
+    
   },
 };
 </script>

@@ -1,18 +1,17 @@
 <template>
   <v-app>
     <div id="app-bar">
-      <Appbar />
+      <Appbar v-if="homepageEnabled"/>
     </div>
     
     <v-main >
-      <v-row>
-        <v-col cols="auto" class="navigation-bar"> 
-          <Navigation v-if="this.$store.state.drawerController"/>
-        </v-col>
-        <v-col  class="main-section">
+   
+        <!-- <v-col cols="auto" class="navigation-bar"> 
+          <Navigation v-if="homepageEnabled"/>
+        </v-col> -->
+        
           <router-view />
-        </v-col>
-      </v-row>
+       
       
     </v-main>
   
@@ -21,13 +20,18 @@
 
 <script>
 import Appbar from "./components/Appbar.vue";
-import Navigation from "./components/Navigation.vue";
+// import Navigation from "./components/Navigation.vue";
 
 export default {
   name: "App",
   components: {
     Appbar,
-    Navigation
+    // Navigation
+  },
+  computed:{
+    homepageEnabled(){
+      return this.$store.state.drawerController
+    }
   },
 
   data: () => ({

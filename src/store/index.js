@@ -12,6 +12,8 @@ export default new Vuex.Store({
     userDetails:{
       name:"",
       uid:"",
+      email:"",
+      imageUrl:"",
     },
 
   },
@@ -35,8 +37,8 @@ export default new Vuex.Store({
       state.isUserLoggedIn =  payload
     },
     
-    userDetails(state,{name,email,uid}){
-      state.userDetails = {...state.userDetails,name:name,email:email,uid:uid}
+    userDetails(state,{name,email,uid,imageUrl}){
+      state.userDetails = {...state.userDetails,name:name,email:email,uid:uid,imageUrl:imageUrl}
     }
     
   },
