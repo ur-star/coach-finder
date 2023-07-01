@@ -4,7 +4,7 @@
       <Errorbar v-if="error" :msg="error"/>
       <v-row>
         <v-spacer></v-spacer>
-        <v-col cols="10" md="5" lg="4">
+        <v-col cols="12" md="6" lg="4">
           <v-card class="pa-5 pb-8 mt-10" height="460" elevation="4" light>
             <v-card-title class="mb-4 justify-center">
               <h2>Coach Finder</h2>
@@ -71,10 +71,7 @@ export default {
       showPass:false
     };
   },
-  beforeMount() {
-    this.$store.commit("drawerController", false);
-    // consolo log at store poayload value
-  },
+ 
   components:{
     Errorbar
   },
@@ -91,8 +88,8 @@ export default {
             let imageUrl =userCredential.user.photoURL
             
             // console.log(name,uid);
-            this.$store.commit('toggleLoggedInStatus',true)
-            this.$store.commit('userDetails',{name,uid,email,imageUrl})
+            this.$store.dispatch('toggleLoggedInStatus',true)
+            this.$store.dispatch('userDetails',{name,uid,email,imageUrl})
             
 
           }
@@ -127,4 +124,3 @@ export default {
 };
 </script>
 
-<style scoped></style>

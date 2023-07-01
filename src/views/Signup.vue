@@ -5,7 +5,7 @@
       <v-row>
         <v-spacer></v-spacer>
 
-        <v-col cols="8" md="6">
+        <v-col cols="12" md="6">
           <v-card rounded elevation="4" class="pa-5 pb-8 mt-10" light>
             <h1 class="mb-4 text-center">User Signup</h1>
             <v-form class="pa-5 pb-8 mt-10" v-model="valid" ref="form">
@@ -84,6 +84,11 @@
                 >Submit</v-btn
               >
             </v-form>
+            <v-card-text class="text-center">
+              Already Registered
+
+              <router-link to="/"> Sign In</router-link>
+            </v-card-text>
           </v-card>
         </v-col>
         <v-spacer></v-spacer>
@@ -153,7 +158,7 @@ export default {
               email: this.email,
             });
 
-            this.$router.push("/");
+            this.$router.push("/login");
           } catch (error) {
             if (error.code == "auth/email-already-in-use")
               this.error = "This email already exist";
@@ -167,9 +172,7 @@ export default {
       }
     },
   },
-  beforeMount() {
-    this.$store.commit("drawerController", false);
-  },
+ 
   computed: {
     fullname() {
       return this.firstName + " " + this.lastName;

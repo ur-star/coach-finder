@@ -21,9 +21,7 @@ export default {
     Dashboard,
     Navigation,
   },
-  beforeMount() {
-    this.$store.commit("drawerController", true);
-  },
+ 
 };
 </script>
 <style scoped>

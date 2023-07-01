@@ -1,49 +1,28 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-
+import VuexPersistence from 'vuex-persist'
+import state from './state'
+import * as getters from './getters'
+import * as mutations from './mutations'
+import * as actions from './actions'
 Vue.use(Vuex)
 
+const vuexLocal = new VuexPersistence({
+  storage: window.sessionStorage,
+  reducer: state => ({
+    // Specify which state properties to persist
+    userDetails: state.userDetails,
+    isUserLoggedIn: state.isUserLoggedIn
+  })
+})
+
 export default new Vuex.Store({
-  state: {
-    drawer:true,
-    drawerController:true,
-    toggleDialog: false,
-    isUserLoggedIn: false,
-    userDetails:{
-      name:"",
-      uid:"",
-      email:"",
-      imageUrl:"",
-    },
-
-  },
-  getters: {
-  },
-  mutations: {
-    toggleDrawer(state){
-      state.drawer = ! state.drawer
-      // console.log("toggleDrawre called appbar",state.drawer);
-
-    },
-    drawerController(state,payload){
-      state.drawerController = payload
-      // console.log("drawercontroller store:",payload);
-    },
-    toggleDialog(state)
-    {
-      state.toggleDialog = !state.toggleDialog
-    },
-    toggleLoggedInStatus(state,payload){
-      state.isUserLoggedIn =  payload
-    },
-    
-    userDetails(state,{name,email,uid,imageUrl}){
-      state.userDetails = {...state.userDetails,name:name,email:email,uid:uid,imageUrl:imageUrl}
-    }
-    
-  },
-  actions: {
-  },
+  state,
+  getters,
+  mutations,
+  actions,
   modules: {
-  }
+  },
+  plugins: [vuexLocal.plugin]
+
 })

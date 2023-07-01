@@ -1,4 +1,5 @@
 <template>
+  <!-- Not in use -->
   <div>
     <v-card max-width="50%" class="pa-5 ma-5">
       <h2 class="mb-4">Add you Display Picture</h2>

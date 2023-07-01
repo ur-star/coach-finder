@@ -7,13 +7,7 @@
         <v-card rounded elevation="4" class="pa-5 pb-8 mt-10" light>
           <h1 class="mb-4 text-center">Trainer Signup</h1>
           <v-form class="pa-5 pb-8 mt-10" v-model="valid" ref="form">
-            <!-- <v-file-input
-                label="Add an Image"
-                outlined
-                small-chips
-                v-model="image"
-                prepend-icon="mdi-camera"
-              ></v-file-input> -->
+           
             <v-text-field
               name="name"
               label="Name"
@@ -89,7 +83,7 @@
 
 <script>
 import Navigation from "../components/Navigation.vue";
-import { storage, db } from "@/firebase";
+import { db } from "@/firebase";
 import router from "@/router";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 //import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
@@ -114,13 +108,13 @@ export default {
 
       showPass: false,
       valid: false,
-      skillItems: ["java", "c++", "python", "javascript", "react", "dotnet"],
+      skillItems: ["Java", "c++", "python", "JavaScript", "react", "dotnet"],
     };
   },
   computed: {
     userDetails() {
       // console.log(this.$store.state.userDetails.uid);
-      return this.$store.state.userDetails;
+      return this.$store.getters.userDetails;
     },
   },
   methods: {
@@ -144,12 +138,13 @@ export default {
 
       } else {
         
-        console.log("No such document!");
+        console.log("You are not a trainer right now");
+        window.alert("you are not a trainer yet!")
       }
     },
   },
   beforeMount() {
-    this.$store.commit("drawerController", true);
+   
     this.getPreviousDetails();
   },
   mounted() {

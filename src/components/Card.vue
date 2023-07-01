@@ -20,10 +20,15 @@
         :key="index"
         >{{ item }}
       </v-chip>
+      <v-card-text class="text-center">
+            <h4> Contact -> {{ email }}</h4>
+            </v-card-text>
       </v-card>
     </v-dialog>
   </div>
 </template>
+
+
     <v-card light elevation="4" class="pa-5  mt-10 mb-2" max-width="auto">
       <v-img :src="source" contain ></v-img>
       <v-divider></v-divider>
@@ -79,6 +84,9 @@ export default {
     skills: {
       type: Array,
     },
+    email: {
+      type: String,
+    }
   },
   data() {
     return {
@@ -87,19 +95,15 @@ export default {
   },
   filters: {
     shortDescription: function (value) {
-      if (value.length > 70) {
-        return value.slice(0, 70) + "....";
+      if (value.length > 50) {
+        return value.slice(0, 50) + "....";
       } else {
         return value;
       }
     },
   },
 
-  methods: {
-    toggleDialogValue: function () {
-      this.$store.commit("toggleDialog");
-    },
-  },
+  
 };
 </script>
 <style>

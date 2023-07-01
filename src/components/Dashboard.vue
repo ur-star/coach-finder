@@ -1,7 +1,7 @@
 <template>
   <div>
-    <h2 class="ma-4">Hello {{ user | name }} !!</h2>
-    <v-row class="mt-6 mx-4">
+    <!-- <h2 class="ma-4">Hello {{ user | name }} !!</h2> -->
+    <v-row class="mt-4 mx-4">
       <v-col cols="12" md="3" sm="6">
         <!-- <Finder /> -->
 
@@ -40,7 +40,7 @@
           </div>
         </template>
       </v-col>
-      <!-- <InfoDialog /> -->
+      <!-- cards -->
       <template v-for="(item, index) in filteredData">
         <v-col cols="auto" md="3" sm="6" class="text-center">
           <Card
@@ -49,8 +49,8 @@
             :name="item.name"
             :skills="item.skills"
             :source="item.source"
+            :email="item.email"
           />
-          <!-- <v-btn>click here</v-btn> -->
         </v-col>
       </template>
     </v-row>
@@ -60,7 +60,7 @@
 <script>
 import Card from "./Card.vue";
 
-import { collection,query, where, getDocs } from "firebase/firestore";
+import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "@/firebase";
 
 export default {
@@ -70,7 +70,7 @@ export default {
   data() {
     return {
       data: [],
-      filteredData:[],
+      filteredData: [],
       index: null,
       countryFilter: "",
       skillFilter: "",
@@ -83,9 +83,8 @@ export default {
 
   computed: {
     user() {
-      return this.$store.state.userDetails.name;
+      return this.$store.getters.userDetails.name;
     },
-    
   },
 
   methods: {
@@ -98,6 +97,7 @@ export default {
           skills: doc.data().skills,
           country: doc.data().country,
           source: doc.data().source,
+          email: doc.data().email,
         };
 
         this.data.push(data);
@@ -105,45 +105,69 @@ export default {
       this.filteredData = this.data;
       // console.log(this.data);
     },
-    // filterdResults() {
-    //   if(this.skillFilter && this.countryFilter){
-    //     const skillFilter = this.skillFilter.toLowerCase().trim();
-      
-    //     const countryFilter = this.countryFilter.toLowerCase().trim();
-      
 
-    //   this.filteredData = this.data.filter(candidate => {
-    //     const candidateSkills = candidate.skills.map(skill => skill.toLowerCase().trim());
-    //     // console.log(candidate.country);
-    //     const candidateLocation = candidate.country.toLowerCase().trim();
-
-    //     return candidateSkills.includes(skillFilter) && candidateLocation === countryFilter;
-    //   })}
-    //   else this.filteredData = this.data
-    // },
     async filterdResults() {
-      console.log("Run filter results ",this.skillFilter);
-      if(this.skillFilter==""&&this.countryFilter=="") this.filteredData = this.data;
+      // console.log("Run filter results ",this.skillFilter);
+      if (this.skillFilter == "" && this.countryFilter == "") {
+        this.filteredData = this.data;
+      } else if (this.skillFilter && this.countryFilter == "") {
+        const q = query(
+          collection(db, "trainers"),
+          where("skills", "array-contains", this.skillFilter)
+        );
 
-      const q = query(
-        collection(db, "trainers"),
-        where("skills", "array-contains", this.skillFilter),
-      );
+        const querySnapshot = await getDocs(q);
 
-      const querySnapshot = await getDocs(q);
-      querySnapshot.forEach((doc) => {
-        const queryData = {
-          name: doc.data().name,
-          description: doc.data().description,
-          skills: doc.data().skills,
-          country: doc.data().country,
-        };
         this.filteredData = [];
-        this.filteredData.push(queryData)
-      });
-      console.log(this.filteredData);
+        querySnapshot.forEach((doc) => {
+          const queryData = {
+            name: doc.data().name,
+            description: doc.data().description,
+            skills: doc.data().skills,
+            country: doc.data().country,
+          };
+          this.filteredData.push(queryData);
+        });
+      } else if (this.countryFilter && this.skillFilter == "") {
+        const q = query(
+          collection(db, "trainers"),
+          where("country", "==", this.countryFilter)
+        );
+
+        const querySnapshot = await getDocs(q);
+
+        this.filteredData = [];
+        querySnapshot.forEach((doc) => {
+          const queryData = {
+            name: doc.data().name,
+            description: doc.data().description,
+            skills: doc.data().skills,
+            country: doc.data().country,
+          };
+          this.filteredData.push(queryData);
+        });
+      } else if (this.skillFilter && this.countryFilter) {
+        const q = query(
+          collection(db, "trainers"),
+          where("country", "==", this.countryFilter),
+          where("skills", "array-contains", this.skillFilter)
+        );
+
+        const querySnapshot = await getDocs(q);
+        console.log(querySnapshot);
+        this.filteredData = [];
+        querySnapshot.forEach((doc) => {
+          const queryData = {
+            name: doc.data().name,
+            description: doc.data().description,
+            skills: doc.data().skills,
+            country: doc.data().country,
+          };
+          this.filteredData.push(queryData);
+        });
+      }
+      // console.log(this.filteredData);
     },
-    
   },
 };
 </script>

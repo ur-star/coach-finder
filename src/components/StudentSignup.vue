@@ -1,4 +1,5 @@
 <template>
+  <!-- Not in use -->
   <div>
     <v-container>
       <Errorbar v-if="error" :msg="error" />
@@ -123,7 +124,7 @@ export default {
                 })
                 .then((response) => {
                   console.log("response", response);
-                  this.$router.push('/')
+                  this.$router.push('/login')
                 }).catch((error)=>{
                   console.error(error);
                 })
@@ -139,9 +140,7 @@ export default {
       }
     },
   },
-  beforeMount() {
-    this.$store.commit("drawerController", false);
-  },
+  
   computed: {
     fullname() {
       return this.firstName + " " + this.lastName;

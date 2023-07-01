@@ -1,4 +1,5 @@
 <template>
+  <!-- Not in use -->
   <div id="detail-card" class="text-center">
     <v-dialog width="800" v-model="toggleDialog">
       <v-card light class="pa-5 pb-8">
@@ -48,7 +49,7 @@ export default {
   computed: {
     toggleDialog: {
       get() {
-        return this.$store.state.toggleDialog;
+        return this.$store.getters.toggleDialog;
       },
       set(value) {
         this.$store.commit("toggleDialog");
