@@ -34,7 +34,7 @@
 
             <v-card-actions>
               <v-btn
-                class="mx-auto font-weight-bold grey darken-4 v-size--x-large white--text"
+                class="mx-auto font-weight-bold grey darken-4 v-size--x-large white--text button"
                 :disabled="!valid"
                 block
                 @click="login"
